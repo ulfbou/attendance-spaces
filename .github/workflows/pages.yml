@@ -18,6 +18,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Render public Cognito configuration
+        env:
+          COGNITO_REGION: ${{ vars.COGNITO_REGION }}
+          COGNITO_USER_POOL_ID: ${{ vars.COGNITO_USER_POOL_ID }}
+          COGNITO_CLIENT_ID: ${{ vars.COGNITO_CLIENT_ID }}
+          COGNITO_DOMAIN: ${{ vars.COGNITO_DOMAIN }}
+        run: >-
+          python scripts/render_runtime_config.py
+          --region "$COGNITO_REGION"
+          --user-pool-id "$COGNITO_USER_POOL_ID"
+          --client-id "$COGNITO_CLIENT_ID"
+          --domain "$COGNITO_DOMAIN"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
