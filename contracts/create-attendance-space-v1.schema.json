@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ulfbou.github.io/attendance-spaces/contracts/create-attendance-space-v1.schema.json",
+  "title": "Create AttendanceSpace command v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "requestId",
+    "idempotencyKey",
+    "name"
+  ],
+  "properties": {
+    "requestId": {
+      "$ref": "identifiers-v1.schema.json#/$defs/requestId"
+    },
+    "idempotencyKey": {
+      "type": "string",
+      "minLength": 16,
+      "maxLength": 128
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    }
+  }
+}

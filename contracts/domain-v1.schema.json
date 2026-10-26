@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ulfbou.github.io/attendance-spaces/contracts/domain-v1.schema.json",
+  "title": "Attendance Spaces domain vocabulary v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "roles",
+    "checkpointKinds",
+    "checkpointLifecycle",
+    "attendanceFacts",
+    "displayStates"
+  ],
+  "properties": {
+    "roles": {
+      "const": [
+        "OWNER",
+        "PARTICIPANT"
+      ]
+    },
+    "checkpointKinds": {
+      "const": [
+        "CHECK_IN",
+        "PRESENCE_CHECK",
+        "CHECK_OUT"
+      ]
+    },
+    "checkpointLifecycle": {
+      "const": [
+        "DRAFT",
+        "SCHEDULED",
+        "OPEN",
+        "CLOSED",
+        "CANCELLED"
+      ]
+    },
+    "attendanceFacts": {
+      "const": [
+        "CHECKED_IN",
+        "PRESENCE_CONFIRMED",
+        "CHECKED_OUT"
+      ]
+    },
+    "displayStates": {
+      "const": [
+        "UPCOMING",
+        "AVAILABLE",
+        "COMPLETED",
+        "ABSENT",
+        "MISSED",
+        "CANCELLED"
+      ]
+    }
+  }
+}

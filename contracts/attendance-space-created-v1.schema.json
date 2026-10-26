@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ulfbou.github.io/attendance-spaces/contracts/attendance-space-created-v1.schema.json",
+  "title": "AttendanceSpace created result v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "space",
+    "ownerMembership",
+    "ownershipClaim",
+    "auditEvent",
+    "idempotency"
+  ],
+  "properties": {
+    "space": {
+      "type": "object",
+      "required": [
+        "spaceId",
+        "name"
+      ],
+      "properties": {
+        "spaceId": {
+          "$ref": "identifiers-v1.schema.json#/$defs/spaceId"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ownerMembership": {
+      "type": "object",
+      "required": [
+        "spaceId",
+        "userId",
+        "role"
+      ],
+      "properties": {
+        "spaceId": {
+          "$ref": "identifiers-v1.schema.json#/$defs/spaceId"
+        },
+        "userId": {
+          "$ref": "identifiers-v1.schema.json#/$defs/userId"
+        },
+        "role": {
+          "const": "OWNER"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ownershipClaim": {
+      "type": "object",
+      "required": [
+        "userId",
+        "spaceId",
+        "unique"
+      ],
+      "properties": {
+        "userId": {
+          "$ref": "identifiers-v1.schema.json#/$defs/userId"
+        },
+        "spaceId": {
+          "$ref": "identifiers-v1.schema.json#/$defs/spaceId"
+        },
+        "unique": {
+          "const": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "auditEvent": {
+      "type": "object",
+      "required": [
+        "eventId",
+        "kind"
+      ],
+      "properties": {
+        "eventId": {
+          "$ref": "identifiers-v1.schema.json#/$defs/eventId"
+        },
+        "kind": {
+          "const": "ATTENDANCE_SPACE_CREATED"
+        }
+      },
+      "additionalProperties": false
+    },
+    "idempotency": {
+      "type": "object",
+      "required": [
+        "key",
+        "replayed"
+      ],
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "replayed": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

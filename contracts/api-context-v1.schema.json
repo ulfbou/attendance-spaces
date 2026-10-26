@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ulfbou.github.io/attendance-spaces/contracts/api-context-v1.schema.json",
+  "title": "Untrusted URL context v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "space": {
+      "$ref": "identifiers-v1.schema.json#/$defs/spaceId"
+    },
+    "checkpoint": {
+      "$ref": "identifiers-v1.schema.json#/$defs/checkpointId"
+    },
+    "invite": {
+      "$ref": "identifiers-v1.schema.json#/$defs/invitationToken"
+    }
+  },
+  "description": "Context locators are untrusted input. Authorization requires authenticated identity and server-side membership checks."
+}

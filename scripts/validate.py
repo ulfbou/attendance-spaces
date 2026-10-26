@@ -26,4 +26,18 @@ if errors:
     for error in errors:
         print(f'BLOCKED {error}', file=sys.stderr)
     raise SystemExit(1)
-print('PASS repository bootstrap contract')
+import json
+for schema_path in sorted((ROOT / 'contracts').glob('*.schema.json')):
+    try:
+        schema = json.loads(schema_path.read_text(encoding='utf-8'))
+    except (OSError, json.JSONDecodeError) as exc:
+        errors.append(f'invalid contract JSON: {schema_path.relative_to(ROOT)}: {exc}')
+        continue
+    for key in ('$schema', '$id', 'title'):
+        if not schema.get(key):
+            errors.append(f'missing {key}: {schema_path.relative_to(ROOT)}')
+if errors:
+    for error in errors:
+        print(f'BLOCKED {error}', file=sys.stderr)
+    raise SystemExit(1)
+print('PASS repository and contract validation')

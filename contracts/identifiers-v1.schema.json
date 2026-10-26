@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ulfbou.github.io/attendance-spaces/contracts/identifiers-v1.schema.json",
+  "title": "Attendance Spaces opaque identifiers v1",
+  "$defs": {
+    "spaceId": {
+      "type": "string",
+      "pattern": "^spc_[A-Za-z0-9_-]{16,64}$"
+    },
+    "checkpointId": {
+      "type": "string",
+      "pattern": "^cp_[A-Za-z0-9_-]{16,64}$"
+    },
+    "userId": {
+      "type": "string",
+      "pattern": "^usr_[A-Za-z0-9_-]{16,64}$"
+    },
+    "eventId": {
+      "type": "string",
+      "pattern": "^evt_[A-Za-z0-9_-]{16,64}$"
+    },
+    "requestId": {
+      "type": "string",
+      "pattern": "^req_[A-Za-z0-9_-]{16,64}$"
+    },
+    "invitationToken": {
+      "type": "string",
+      "pattern": "^inv_[A-Za-z0-9_-]{32,128}$"
+    }
+  }
+}
