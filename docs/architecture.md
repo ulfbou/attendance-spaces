@@ -15,3 +15,5 @@ The callback consumes its transaction once, exchanges the code at Cognito, keeps
 short browser session in session storage, restores only validated attendance context,
 and fails closed. Definitive token verification and space authorization belong to the
 backend boundary.
+
+Issue #4 backend details are defined in `docs/backend-and-data-model.md`.

@@ -12,3 +12,5 @@ without permanent export storage.
 - Failure creates no authenticated browser session.
 - Callback and logout remain safe beneath `/attendance-spaces/`.
 - Browser claims are presentation-only; backend JWT and membership checks remain mandatory.
+
+Issue #4 backend details are defined in `docs/backend-and-data-model.md`.

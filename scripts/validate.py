@@ -10,7 +10,9 @@ required = [
     'docs/security-and-threat-model.md', 'docs/privacy-and-data-handling.md',
     'docs/operations-and-cost.md', 'docs/acceptance.md',
     'docs/portfolio-integration.md', 'docs/authentication-operations.md',
-    'infrastructure/cognito.yaml', 'scripts/render_runtime_config.py',
+    'infrastructure/cognito.yaml', 'infrastructure/backend.yaml',
+    'backend/app.py', 'backend/domain.py', 'backend/repository.py', 'backend/verifier.py',
+    'docs/backend-and-data-model.md', 'scripts/render_runtime_config.py',
     '.github/workflows/validate.yml',
     '.github/workflows/pages.yml',
 ]
@@ -53,6 +55,14 @@ for schema_path in sorted((ROOT / 'contracts').glob('*.schema.json')):
     for key in ('$schema', '$id', 'title'):
         if not schema.get(key):
             errors.append(f'missing {key}: {schema_path.relative_to(ROOT)}')
+if errors:
+    for error in errors:
+        print(f'BLOCKED {error}', file=sys.stderr)
+    raise SystemExit(1)
+backend = (ROOT / 'infrastructure/backend.yaml').read_text(encoding='utf-8')
+for marker in ('AWS::DynamoDB::Table', 'AWS::Lambda::Function', 'AWS::Lambda::Url', 'RetentionInDays: 7'):
+    if marker not in backend:
+        errors.append(f'missing bounded backend marker: {marker}')
 if errors:
     for error in errors:
         print(f'BLOCKED {error}', file=sys.stderr)
