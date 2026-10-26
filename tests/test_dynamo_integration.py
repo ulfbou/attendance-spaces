@@ -50,6 +50,16 @@ from backend.domain import DomainError
 from backend.repository import DynamoRepository
 
 
+# compose.yaml sets AWS_PROFILE="" to suppress host profile lookup. botocore
+# treats an empty value as a real (missing) profile name and raises
+# ProfileNotFound during boto3.client() construction, before any request is
+# sent. Remove the variable so the session uses static credentials from
+# AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY, which compose already provides.
+# (Follow-up: drop AWS_PROFILE: "" from compose.yaml â€” latent C1 bug surfaced
+# by C2.)
+os.environ.pop("AWS_PROFILE", None)
+
+
 RUN = bool(os.environ.get("AWS_ENDPOINT_URL_DYNAMODB"))
 TABLE_NAME = os.environ.get("LOCAL_DDB_TABLE", "attendance-spaces-integration")
 
