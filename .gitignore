@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+coverage/
+.pytest_cache/
+__pycache__/
+*.pyc
+.aws-sam/
+.terraform/
+*.tfstate
+*.tfstate.*
+.DS_Store
+Thumbs.db
