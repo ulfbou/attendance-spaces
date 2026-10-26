@@ -1,0 +1,24 @@
+name: attendance-spaces-local
+
+services:
+  dev:
+    profiles: [tools]
+    build: { context: ., dockerfile: Dockerfile.dev }
+    working_dir: /workspace
+    volumes: [ ".:/workspace" ]
+    environment:
+      AWS_REGION: eu-north-1
+      AWS_DEFAULT_REGION: eu-north-1
+      AWS_ACCESS_KEY_ID: local
+      AWS_SECRET_ACCESS_KEY: local
+      AWS_PROFILE: ""
+      AWS_EC2_METADATA_DISABLED: "true"
+      AWS_ENDPOINT_URL_DYNAMODB: http://dynamodb:8000
+    depends_on: [ dynamodb ]
+    labels: { com.attendance-spaces.scope: local-dev }
+
+  dynamodb:
+    image: amazon/dynamodb-local:2.5.2
+    command: ["-jar", "DynamoDBLocal.jar", "-inMemory", "-sharedDb"]
+    ports: [ "${LOCAL_DDB_PORT:-8000}:8000" ]
+    labels: { com.attendance-spaces.scope: local-dev }

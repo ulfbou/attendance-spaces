@@ -1,0 +1,14 @@
+# Loaded only with:
+#   docker compose -f compose.yaml -f local/persistent.compose.yaml up -d
+# Never selected implicitly.
+services:
+  dynamodb:
+    command: ["-jar", "DynamoDBLocal.jar", "-sharedDb"]
+    volumes:
+      - dynamodb_data:/home/dynamodblocal/data
+
+volumes:
+  dynamodb_data:
+    labels:
+      com.attendance-spaces.scope: local-dev
+      com.attendance-spaces.mode: persistent
