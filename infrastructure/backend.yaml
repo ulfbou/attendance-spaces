@@ -1,42 +1,36 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Attendance Spaces bounded backend
+Description: Attendance Spaces bounded backend and cost controls
 Parameters:
   UserPoolId: {Type: String}
   BrowserClientId: {Type: String}
   AllowedOrigin: {Type: String, Default: 'https://ulfbou.github.io'}
+  PackageBucket: {Type: String}
+  PackageKey: {Type: String}
+  PackageVersion: {Type: String, Default: ''}
+  BudgetAmount: {Type: Number, Default: 5, MinValue: 1}
+  BudgetEmail: {Type: String, AllowedPattern: '^[^@]+@[^@]+$'}
 Resources:
   AttendanceTable:
     Type: AWS::DynamoDB::Table
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
     Properties:
       BillingMode: PAY_PER_REQUEST
-      AttributeDefinitions:
-        - {AttributeName: PK, AttributeType: S}
-        - {AttributeName: SK, AttributeType: S}
-      KeySchema:
-        - {AttributeName: PK, KeyType: HASH}
-        - {AttributeName: SK, KeyType: RANGE}
+      AttributeDefinitions: [{AttributeName: PK, AttributeType: S}, {AttributeName: SK, AttributeType: S}]
+      KeySchema: [{AttributeName: PK, KeyType: HASH}, {AttributeName: SK, KeyType: RANGE}]
       PointInTimeRecoverySpecification: {PointInTimeRecoveryEnabled: true}
       SSESpecification: {SSEEnabled: true}
   BackendRole:
     Type: AWS::IAM::Role
     Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal: {Service: lambda.amazonaws.com}
-            Action: sts:AssumeRole
+      AssumeRolePolicyDocument: {Version: '2012-10-17', Statement: [{Effect: Allow, Principal: {Service: lambda.amazonaws.com}, Action: 'sts:AssumeRole'}]}
       Policies:
         - PolicyName: attendance-table-only
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
-              - Effect: Allow
-                Action: [dynamodb:GetItem, dynamodb:Query, dynamodb:PutItem, dynamodb:UpdateItem, dynamodb:TransactWriteItems]
-                Resource: !GetAtt AttendanceTable.Arn
-              - Effect: Allow
-                Action: [logs:CreateLogGroup, logs:CreateLogStream, logs:PutLogEvents]
-                Resource: '*'
+              - {Effect: Allow, Action: ['dynamodb:GetItem','dynamodb:Query','dynamodb:PutItem','dynamodb:UpdateItem','dynamodb:TransactWriteItems'], Resource: !GetAtt AttendanceTable.Arn}
+              - {Effect: Allow, Action: ['logs:CreateLogGroup','logs:CreateLogStream','logs:PutLogEvents'], Resource: '*'}
   BackendFunction:
     Type: AWS::Lambda::Function
     Properties:
@@ -47,38 +41,28 @@ Resources:
       Timeout: 10
       MemorySize: 256
       ReservedConcurrentExecutions: 10
-      Environment:
-        Variables:
-          TABLE_NAME: !Ref AttendanceTable
-          USER_POOL_ID: !Ref UserPoolId
-          CLIENT_ID: !Ref BrowserClientId
-      Code:
-        ZipFile: |
-          def handler(event, context):
-              raise RuntimeError('Deploy repository backend package')
+      Environment: {Variables: {TABLE_NAME: !Ref AttendanceTable, USER_POOL_ID: !Ref UserPoolId, CLIENT_ID: !Ref BrowserClientId}}
+      Code: {S3Bucket: !Ref PackageBucket, S3Key: !Ref PackageKey, S3ObjectVersion: !If [HasPackageVersion, !Ref PackageVersion, !Ref 'AWS::NoValue']}
   BackendLogGroup:
     Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub '/aws/lambda/${BackendFunction}'
-      RetentionInDays: 7
+    Properties: {LogGroupName: !Sub '/aws/lambda/${BackendFunction}', RetentionInDays: 7}
   BackendUrl:
     Type: AWS::Lambda::Url
-    Properties:
-      TargetFunctionArn: !GetAtt BackendFunction.Arn
-      AuthType: NONE
-      InvokeMode: BUFFERED
-      Cors:
-        AllowOrigins: [!Ref AllowedOrigin]
-        AllowMethods: [GET, POST]
-        AllowHeaders: [authorization, content-type]
-        MaxAge: 300
+    Properties: {TargetFunctionArn: !GetAtt BackendFunction.Arn, AuthType: NONE, InvokeMode: BUFFERED, Cors: {AllowOrigins: [!Ref AllowedOrigin], AllowMethods: [GET, POST], AllowHeaders: [authorization, content-type], MaxAge: 300}}
   PublicInvokePermission:
     Type: AWS::Lambda::Permission
+    Properties: {FunctionName: !Ref BackendFunction, Action: 'lambda:InvokeFunctionUrl', Principal: '*', FunctionUrlAuthType: NONE}
+  PrototypeBudget:
+    Type: AWS::Budgets::Budget
     Properties:
-      FunctionName: !Ref BackendFunction
-      Action: lambda:InvokeFunctionUrl
-      Principal: '*'
-      FunctionUrlAuthType: NONE
+      Budget: {BudgetName: !Sub '${AWS::StackName}-monthly', BudgetLimit: {Amount: !Ref BudgetAmount, Unit: USD}, BudgetType: COST, TimeUnit: MONTHLY}
+      NotificationsWithSubscribers:
+        - Notification: {ComparisonOperator: GREATER_THAN, NotificationType: FORECASTED, Threshold: 80, ThresholdType: PERCENTAGE}
+          Subscribers: [{SubscriptionType: EMAIL, Address: !Ref BudgetEmail}]
+Conditions:
+  HasPackageVersion: !Not [!Equals [!Ref PackageVersion, '']]
 Outputs:
   TableName: {Value: !Ref AttendanceTable}
   FunctionUrl: {Value: !GetAtt BackendUrl.FunctionUrl}
+  LogRetentionDays: {Value: 7}
+  BudgetName: {Value: !Sub '${AWS::StackName}-monthly'}

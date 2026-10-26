@@ -13,6 +13,8 @@ required = [
     'infrastructure/cognito.yaml', 'infrastructure/backend.yaml',
     'backend/app.py', 'backend/domain.py', 'backend/repository.py', 'backend/verifier.py',
     'docs/backend-and-data-model.md', 'scripts/render_runtime_config.py',
+    'backend/xlsx_export.py', 'scripts/package_backend.py', 'scripts/smoke_test.py',
+    'contracts/acceptance-evidence-v1.schema.json',
     '.github/workflows/validate.yml',
     '.github/workflows/pages.yml',
 ]
@@ -60,9 +62,16 @@ if errors:
         print(f'BLOCKED {error}', file=sys.stderr)
     raise SystemExit(1)
 backend = (ROOT / 'infrastructure/backend.yaml').read_text(encoding='utf-8')
-for marker in ('AWS::DynamoDB::Table', 'AWS::Lambda::Function', 'AWS::Lambda::Url', 'RetentionInDays: 7'):
+for marker in ('AWS::DynamoDB::Table', 'AWS::Lambda::Function', 'AWS::Lambda::Url', 'RetentionInDays: 7', 'AWS::Budgets::Budget', 'S3Bucket: !Ref PackageBucket'):
     if marker not in backend:
         errors.append(f'missing bounded backend marker: {marker}')
+if 'ZipFile:' in backend or 'AWS::S3::Bucket' in backend:
+    errors.append('placeholder Lambda or export-storage bucket present')
+for path in ROOT.rglob('*'):
+    if path.is_file() and '.git' not in path.parts and '__pycache__' not in path.parts and path.suffix not in {'.pyc','.zip','.xlsx'} and path.stat().st_size < 2_000_000:
+        text=path.read_text(encoding='utf-8',errors='ignore')
+        if any(marker in text for marker in ('AK' + 'IA', 'BEGIN ' + 'PRIVATE KEY', 'client_' + 'secret=')):
+            errors.append(f'possible committed secret: {path.relative_to(ROOT)}')
 if errors:
     for error in errors:
         print(f'BLOCKED {error}', file=sys.stderr)
