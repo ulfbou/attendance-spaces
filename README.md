@@ -27,6 +27,9 @@ The `ulfbou.github.io` repository remains the portfolio and discovery authority.
 - `docs/` architecture, privacy, security, operations, and acceptance
 - `tests/` cross-boundary tests
 
+Authentication deployment and public configuration are documented in
+`docs/authentication-operations.md`.
+
 ## Public locations
 
 - Application: <https://ulfbou.github.io/attendance-spaces/>

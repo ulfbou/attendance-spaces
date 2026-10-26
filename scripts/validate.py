@@ -5,10 +5,13 @@ ROOT = Path(__file__).resolve().parents[1]
 required = [
     'README.md', 'LICENSE', 'CONTRIBUTING.md', 'SECURITY.md',
     'frontend/index.html', 'frontend/auth/callback.html',
+    'frontend/assets/auth.js', 'frontend/assets/runtime-config.js',
     'docs/product-and-scope.md', 'docs/architecture.md',
     'docs/security-and-threat-model.md', 'docs/privacy-and-data-handling.md',
     'docs/operations-and-cost.md', 'docs/acceptance.md',
-    'docs/portfolio-integration.md', '.github/workflows/validate.yml',
+    'docs/portfolio-integration.md', 'docs/authentication-operations.md',
+    'infrastructure/cognito.yaml', 'scripts/render_runtime_config.py',
+    '.github/workflows/validate.yml',
     '.github/workflows/pages.yml',
 ]
 errors = []
@@ -29,6 +32,13 @@ else:
         errors.append('configured public base path is missing')
     if 'callbackPath: "/attendance-spaces/auth/callback.html"' not in config_source:
         errors.append('configured authentication callback path is missing')
+auth_source = (ROOT / 'frontend/assets/auth.js').read_text(encoding='utf-8')
+for required_auth_marker in ('code_challenge_method: "S256"', 'response_type: "code"', 'code_verifier: transaction.verifier'):
+    if required_auth_marker not in auth_source:
+        errors.append(f'missing authentication boundary: {required_auth_marker}')
+runtime_source = (ROOT / 'frontend/assets/runtime-config.js').read_text(encoding='utf-8')
+if 'clientSecret' in runtime_source or 'client_secret' in runtime_source:
+    errors.append('public runtime configuration contains a client secret')
 if errors:
     for error in errors:
         print(f'BLOCKED {error}', file=sys.stderr)

@@ -10,6 +10,7 @@ a { color: #174ea6; }
 .skip-link { position: fixed; left: 1rem; top: -5rem; padding: .75rem 1rem; background: white; z-index: 10; }
 .skip-link:focus { top: 1rem; }
 .site-header, .site-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem clamp(1rem, 5vw, 4rem); background: #fff; }
+.auth-controls { display: flex; align-items: center; gap: .75rem; }
 .brand { color: #172033; font-weight: 800; text-decoration: none; }
 .shell { width: min(72rem, 100%); margin: 0 auto; padding: clamp(2rem, 7vw, 6rem) clamp(1rem, 5vw, 4rem); }
 .hero { max-width: 52rem; }
