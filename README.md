@@ -39,3 +39,5 @@ Authentication deployment and public configuration are documented in
 
 Sprint 0 bootstrap. Product behavior and cloud resources are intentionally not
 implemented by this commit.
+
+Issue #4 backend details are defined in `docs/backend-and-data-model.md`.

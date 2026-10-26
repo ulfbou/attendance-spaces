@@ -16,3 +16,5 @@ The browser decodes only bounded identity claims for presentation. It does not m
 an authorization decision from those claims. The Lambda must independently verify
 the Cognito JWT signature, issuer, client, expiration, and token_use, then evaluate
 current space-local membership for every protected operation.
+
+Issue #4 backend details are defined in `docs/backend-and-data-model.md`.

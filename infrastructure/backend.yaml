@@ -1,0 +1,84 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Attendance Spaces bounded backend
+Parameters:
+  UserPoolId: {Type: String}
+  BrowserClientId: {Type: String}
+  AllowedOrigin: {Type: String, Default: 'https://ulfbou.github.io'}
+Resources:
+  AttendanceTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - {AttributeName: PK, AttributeType: S}
+        - {AttributeName: SK, AttributeType: S}
+      KeySchema:
+        - {AttributeName: PK, KeyType: HASH}
+        - {AttributeName: SK, KeyType: RANGE}
+      PointInTimeRecoverySpecification: {PointInTimeRecoveryEnabled: true}
+      SSESpecification: {SSEEnabled: true}
+  BackendRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: {Service: lambda.amazonaws.com}
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: attendance-table-only
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: [dynamodb:GetItem, dynamodb:Query, dynamodb:PutItem, dynamodb:UpdateItem, dynamodb:TransactWriteItems]
+                Resource: !GetAtt AttendanceTable.Arn
+              - Effect: Allow
+                Action: [logs:CreateLogGroup, logs:CreateLogStream, logs:PutLogEvents]
+                Resource: '*'
+  BackendFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: python3.13
+      Architectures: [arm64]
+      Handler: backend.app.handler
+      Role: !GetAtt BackendRole.Arn
+      Timeout: 10
+      MemorySize: 256
+      ReservedConcurrentExecutions: 10
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref AttendanceTable
+          USER_POOL_ID: !Ref UserPoolId
+          CLIENT_ID: !Ref BrowserClientId
+      Code:
+        ZipFile: |
+          def handler(event, context):
+              raise RuntimeError('Deploy repository backend package')
+  BackendLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${BackendFunction}'
+      RetentionInDays: 7
+  BackendUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      TargetFunctionArn: !GetAtt BackendFunction.Arn
+      AuthType: NONE
+      InvokeMode: BUFFERED
+      Cors:
+        AllowOrigins: [!Ref AllowedOrigin]
+        AllowMethods: [GET, POST]
+        AllowHeaders: [authorization, content-type]
+        MaxAge: 300
+  PublicInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref BackendFunction
+      Action: lambda:InvokeFunctionUrl
+      Principal: '*'
+      FunctionUrlAuthType: NONE
+Outputs:
+  TableName: {Value: !Ref AttendanceTable}
+  FunctionUrl: {Value: !GetAtt BackendUrl.FunctionUrl}
