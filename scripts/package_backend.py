@@ -7,7 +7,7 @@ def build(output):
     output.parent.mkdir(parents=True,exist_ok=True)
     with ZipFile(output,'w',ZIP_DEFLATED,compresslevel=9) as archive:
         for path in FILES:
-            info=ZipInfo(path.relative_to(ROOT).as_posix(),(1980,1,1,0,0,0)); info.compress_type=ZIP_DEFLATED; info.external_attr=0o644 << 16
+            info=ZipInfo(path.relative_to(ROOT).as_posix(),(1980,1,1,0,0,0)); info.create_system=3; info.compress_type=ZIP_DEFLATED; info.external_attr=0o644 << 16
             archive.writestr(info,path.read_bytes())
     digest=hashlib.sha256(output.read_bytes()).hexdigest()
     manifest={"schema":"attendance-spaces-backend-package/v1","sha256":digest,"bytes":output.stat().st_size,"files":[p.relative_to(ROOT).as_posix() for p in FILES]}
