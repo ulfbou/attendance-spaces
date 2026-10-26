@@ -20,8 +20,15 @@ index = (ROOT / 'frontend/index.html').read_text(encoding='utf-8')
 for forbidden in ('href="/assets/', 'src="/assets/'):
     if forbidden in index:
         errors.append(f'root-relative asset detected: {forbidden}')
-if '/attendance-spaces/' not in (ROOT / 'frontend/assets/app.js').read_text(encoding='utf-8'):
-    errors.append('configured public base path is missing')
+frontend_config = ROOT / 'frontend/assets/config.js'
+if not frontend_config.is_file():
+    errors.append('frontend public configuration is missing')
+else:
+    config_source = frontend_config.read_text(encoding='utf-8')
+    if 'basePath: "/attendance-spaces/"' not in config_source:
+        errors.append('configured public base path is missing')
+    if 'callbackPath: "/attendance-spaces/auth/callback.html"' not in config_source:
+        errors.append('configured authentication callback path is missing')
 if errors:
     for error in errors:
         print(f'BLOCKED {error}', file=sys.stderr)

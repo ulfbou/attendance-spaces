@@ -3,16 +3,34 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Attendance Spaces prototype">
+  <meta name="description" content="Attendance Spaces, enkel och säker närvarohantering.">
   <title>Attendance Spaces</title>
-  ./assets/app.css
+  <link rel="stylesheet" href="./assets/app.css">
 </head>
 <body>
-  <main>
-    <p class="eyebrow">Prototyp</p>
-    <h1>Attendance Spaces</h1>
-    <p>En säker och enkel närvarotjänst är under uppbyggnad.</p>
+  <a class="skip-link" href="#main">Hoppa till innehållet</a>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Attendance Spaces, startsida">Attendance Spaces</a>
+    <button id="login-button" class="button button-secondary" type="button">Logga in</button>
+  </header>
+  <main id="main" class="shell" tabindex="-1">
+    <section class="hero" aria-labelledby="hero-title">
+      <p class="eyebrow">Närvaro utan onödig administration</p>
+      <h1 id="hero-title">Rätt person. Rätt tillfälle. Tydlig historik.</h1>
+      <p class="lead">Skapa ett närvarorum, bjud in deltagare och följ incheckning, närvarokontroll och utcheckning.</p>
+      <div class="actions">
+        <button id="primary-action" class="button button-primary" type="button">Kom igång</button>
+        <a class="button button-secondary" href="./">Visa demovy</a>
+      </div>
+    </section>
+    <section class="context-card" aria-labelledby="context-title">
+      <h2 id="context-title">Aktuell kontext</h2>
+      <p id="context-message" role="status" aria-live="polite">Ingen närvarokontext har valts.</p>
+      <dl id="context-details" class="context-details" hidden></dl>
+    </section>
+    <noscript>JavaScript krävs för att använda Attendance Spaces.</noscript>
   </main>
-  ./assets/app.jsscript>
+  <footer class="site-footer"><p>Prototyp 1 · Svenska först, lokaliserbar fortsättning</p></footer>
+  <script type="module" src="./assets/app.js"></script>
 </body>
 </html>

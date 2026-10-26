@@ -1,1 +1,5 @@
-// Cognito authorization-code and PKCE handling is introduced in a scoped issue.
+import { publicConfig } from "./config.js";
+
+const status = document.querySelector("#callback-status");
+status.textContent = "Autentiseringssvaret kan behandlas när Cognito-integrationen är konfigurerad.";
+window.ATTENDANCE_PUBLIC_CONFIG = publicConfig;
