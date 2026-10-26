@@ -1,5 +1,19 @@
 <!doctype html>
 <html lang="sv">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Loggar in</title></head>
-<body><main><h1>Loggar in...</h1><p>Autentiseringssvaret behandlas.</p></main>../assets/auth-callback.jsscript></body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Loggar in · Attendance Spaces</title>
+  <link rel="stylesheet" href="../assets/app.css">
+</head>
+<body>
+  <main class="shell callback-shell">
+    <p class="eyebrow">Säker inloggning</p>
+    <h1>Loggar in</h1>
+    <p id="callback-status" role="status" aria-live="polite">Autentiseringssvaret förbereds.</p>
+    <p><a href="../">Till startsidan</a></p>
+  </main>
+  <script type="module" src="../assets/auth-callback.js"></script>
+</body>
 </html>
